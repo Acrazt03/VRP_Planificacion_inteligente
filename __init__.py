@@ -20,5 +20,7 @@ prob_de_mut = 0.1
 
 solution = vrp.create_clusters(qty_clients, qty_trucks, qty_poblacion, n_elite, n_generations, prob_de_mut)
 
-print(solution)
+conn_radius = 0.5
+
+print(vrp.create_routes(Depot_node, clients, qty_trucks, solution, conn_radius))
 

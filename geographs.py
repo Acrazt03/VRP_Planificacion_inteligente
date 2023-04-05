@@ -160,8 +160,12 @@ class GeoGraph(Graph):
                     return geoNode
     
     def get_random_node(self):
-       return random.sample(self.get_nodes(), 1)[0]
-
+      random_node = random.sample(self.get_nodes(), 1)[0]
+      
+      if random_node.available:
+        return random_node
+      else:
+        return self.get_random_node()
 import heapq
 
 class PriorityQueue():

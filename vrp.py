@@ -2,6 +2,8 @@ import geographs
 import random
 import math
 
+from geographs import Graph, Node
+
 geoGraph = geographs.GeoGraph()
 
 class Client():
@@ -49,5 +51,41 @@ def create_clusters(qty_clients: int , qty_trucks: int, qty_poblacion: int, n_el
     
     return best_solution
 
-def create_routes(depot_node: geographs.GeoNode, clients: list, truck_clusters: list, conn_radius: float):
-    pass
+def find_indices(list_to_check, item_to_find):
+    indices = []
+    for idx, value in enumerate(list_to_check):
+        if value == item_to_find:
+            indices.append(idx)
+    return indices
+
+def create_routes(depot_node: geographs.GeoNode, clients: list, qty_trucks: int, clusters: list, conn_radius: float):
+
+    #truck_clusters = [0,1,2,0,0,1,1,2,2,0]
+    #qty_trucks = 3
+
+    truck_clusters = []
+
+    for cluster_id in range(qty_trucks):
+        client_ids = find_indices(clusters, cluster_id)
+
+        truck_cluster = []
+
+        for client_id in client_ids:
+            truck_cluster.append(clients[client_id])
+        
+        truck_clusters.append(truck_cluster)
+
+    graphs = []
+
+    for truck_cluster in truck_clusters:
+        graph = Graph()
+
+        for client in truck_cluster:
+            for other_client in truck_cluster:
+            
+                if client == other_client:
+                    continue
+            
+                if geoGraph.calculate_euclidian_distance(client.node.name, other_client.node.name) <= conn_radius:
+                    graph.add_vertex(client.node.name, other_client.node.name, w, directed=True)
+        graphs.append(graph)
