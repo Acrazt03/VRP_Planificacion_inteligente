@@ -2,12 +2,14 @@ import geographs
 import random
 import math
 
-from geographs import Graph, Node
+from graphs import Graph, Node
 
-geoGraph = geographs.GeoGraph()
+from AStar import a_star_solver
+
+from routegraphs import RouteNode
 
 class Client():
-    def __init__(self, coords: tuple=None, time_window: tuple=None, product: float=10):
+    def __init__(self, geoGraph, coords: tuple=None, time_window: tuple=None, product: float=10):
 
         if not coords:
             #Random
@@ -23,14 +25,14 @@ class Client():
     def __str__(self) -> str:
         return f"Client {self.node.id} with time window: {self.time_window}, product: {self.product}, coords: {self.coords}"
 
-def create_nodes(Depot_coord: tuple, qty_clients: int, cap_trucks: int):
+def create_nodes(geoGraph, Depot_coord: tuple, qty_clients: int, cap_trucks: int):
     
     Depot_node = geoGraph.get_nearest_geoNode(*Depot_coord)
 
     clients = []
 
     for i in range(qty_clients):
-        client = Client()
+        client = Client(geoGraph)
         clients.append(client)
     
     max_product_qty = 0
@@ -58,8 +60,35 @@ def find_indices(list_to_check, item_to_find):
             indices.append(idx)
     return indices
 
-def create_routes(depot_node: geographs.GeoNode, clients: list, qty_trucks: int, clusters: list, conn_radius: float):
+def reconstruct_path(geoGraph,start_node, goal_node, parent_node):
+  path = [goal_node]
 
+  current_parent = parent_node[goal_node]
+  path.append(current_parent)
+
+  while current_parent:
+
+    next_parent = parent_node[current_parent]
+    path.append(next_parent)
+
+    if next_parent == start_node:
+      break
+    
+    current_parent = next_parent
+  
+  path.reverse()
+
+  cost = 0
+
+  for i in range(len(path)-1):
+    cost += geoGraph.get_cost(path[i], path[i+1])
+
+  return path, cost
+
+def create_routes(geoGraph,depot_node: geographs.GeoNode, clients: list, qty_trucks: int, clusters: list, conn_radius: float):
+
+    #geoGraph = geographs.GeoGraph()
+                    
     #truck_clusters = [0,1,2,0,0,1,1,2,2,0]
     #qty_trucks = 3
 
@@ -75,10 +104,15 @@ def create_routes(depot_node: geographs.GeoNode, clients: list, qty_trucks: int,
         
         truck_clusters.append(truck_cluster)
 
+    print("Truck Clusters: ", truck_clusters)
+
     graphs = []
+
+    i = 1
 
     for truck_cluster in truck_clusters:
         graph = Graph()
+        print(f"Truck {i}/{qty_trucks}")
 
         for client in truck_cluster:
             for other_client in truck_cluster:
@@ -87,5 +121,28 @@ def create_routes(depot_node: geographs.GeoNode, clients: list, qty_trucks: int,
                     continue
             
                 if geoGraph.calculate_euclidian_distance(client.node.name, other_client.node.name) <= conn_radius:
-                    graph.add_vertex(client.node.name, other_client.node.name, w, directed=True)
+                    
+                    SUCCESS, visited, parent_node, _ = a_star_solver(geoGraph, client.node, other_client.node)
+                    #print('Success: ', SUCCESS)
+                    #print('Visited: ', [node.name for node in visited])
+
+                    #if not SUCCESS:
+                    #    continue
+
+                    route, distance = reconstruct_path(geoGraph,client.node, other_client.node, parent_node)
+                    #print(f'Distance: {distance:.2f} km')
+
+                    #graph.add_node(name=client.node.name, value=route)
+                    #graph.nodes[client.node.name].node = client.node
+                    
+                    client.node.value = route
+
+                    graph.nodes[client.node.name] = client.node
+                    graph.adj_list[client.node.name] = {}
+                    
+                    graph.add_vertex(client.node.name, other_client.node.name, w=distance, directed=True)
+
+        i += 1
         graphs.append(graph)
+    
+    return graphs

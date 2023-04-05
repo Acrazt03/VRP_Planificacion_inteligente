@@ -18,7 +18,7 @@ class Node:
     return self.domain
 
   def __str__(self):
-    return self.name
+    return f"Node: {self.name} with value: {self.value}"
 
   def __lt__(self, other):
     return True
