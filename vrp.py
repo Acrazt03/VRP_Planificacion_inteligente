@@ -5,6 +5,7 @@ import math
 from geographs import Graph, Node
 
 geoGraph = geographs.GeoGraph()
+inf = float('inf')
 
 class Client():
     def __init__(self, coords: tuple=None, time_window: tuple=None, product: float=10):
@@ -23,8 +24,8 @@ class Client():
     def __str__(self) -> str:
         return f"Client {self.node.id} with time window: {self.time_window}, product: {self.product}, coords: {self.coords}"
 
+
 def create_nodes(Depot_coord: tuple, qty_clients: int, cap_trucks: int):
-    
     Depot_node = geoGraph.get_nearest_geoNode(*Depot_coord)
 
     clients = []
@@ -42,18 +43,59 @@ def create_nodes(Depot_coord: tuple, qty_clients: int, cap_trucks: int):
 
     return Depot_node, clients, qty_trucks
 
-def create_clusters(qty_clients: int , qty_trucks: int, qty_poblacion: int, n_elite: int, n_generations: int, prob_de_mut: float = 0.1):
-    
-    best_solution = []
 
-    for i in range(qty_clients):
-        best_solution.append(random.randint(0, qty_trucks-1))
+def create_clusters(qty_clients: int , qty_trucks: int, cap_trucks: int, qty_poblacion: int, n_elite: int, n_generations: int, clients, prob_de_mut: float = 0.1):
+    population = []
+    for i in range(qty_poblacion):
+        inv = []
+
+        for j in range(qty_clients):
+            inv.append(random.randint(0, qty_trucks-1))
+            
+        population.append(inv)
+
+    clusters = set(population[0])
+    for generation in range(n_generations):
+        population_fitness = [fitness(solution, clusters, qty_trucks, clients, cap_trucks) for solution in population]
     
-    return best_solution
+
+    return population
+
+
+def fitness(solution, clusters, qty_trucks, clients, cap_trucks):
+    truck_clusters = []
+    fitness = 0
+
+    for cluster_id in range(qty_trucks):
+        client_ids = find_indices(clusters, cluster_id)
+
+        truck_cluster = []
+
+        for client_id in client_ids:
+            truck_cluster.append(clients[client_id])
+        
+        truck_clusters.append(truck_cluster)
+
+    for cluster in truck_clusters:
+        for client in cluster:
+            total_cap += client.product
+
+        if not total_cap <= cap_trucks:
+            return inf
+        
+    fitness = distance(solution)
+
+    return fitness
+
+
+def distance(rute):
+    pass
+
 
 def find_indices(list_to_check, item_to_find):
     indices = []
     for idx, value in enumerate(list_to_check):
         if value == item_to_find:
             indices.append(idx)
+
     return indices
