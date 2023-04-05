@@ -1,0 +1,78 @@
+1ra fase:
+
+Cliente:
+    Posicion geografica (que es un nodo en osm)
+    Hora de entrega minima y maxima (time window)
+    Demanda de producto
+
+Al algoritmo se le pasa:
+    una coordenada geografica que es el depot (Depot_coord)
+    un numero de qty de clientes (qty_clients)
+    velocidad (vel_trucks) y capacidad (cap_trucks) de los camiones
+    y los hiperparametros de los algoritmos geneticos (hyper) 
+
+1. *A partir del Depot_coord, se busca el nodo (Depot_node) de osm que este mas cercano, este sera el nodo inicial
+2. Se crea la lista de clientes (clients) (al azar) que sera utilizado por todo el algoritmo
+3. Se calcula la cantidad maxima de producto (max_product_qty) (esto es la suma de el producto de todos los clients) esto se divide entre la cantidad que cada camion puede llevar
+    Asi se consigue la cantidad de camiones inicial (qty_trucks = max_product_qty/cap_trucks)
+
+2da fase, dividir los clientes en rutas por medio de un algoritmo genetico:
+
+S = [0,1,2,0,0,1,1,2,2,0]
+
+C0 = [0,3,4,9]
+C1 = [1,5,6]
+C2 = [2,7,8]
+
+def fitness(S):
+    
+    fitness = 0
+    
+    for ruta in S:
+        if not cumple_con_capacidad(ruta):
+            fitness = inf
+            return fitness
+        
+        fitness += distancia(ruta)
+    
+    return fitness
+
+Al algoritmo se le pasan:
+    hiperparametros (qty_poblacion, n_elite, n_generaciones, prob_de_mut)
+    
+1. Se crean qty_poblacion soluciones, esto de manera aleatoria donde cada solucion es una lista, en la que cada posicion corresponde a un cliente,
+    es decir su (len == qty_clients), cada posicion debe tomar un valor entre 0 y la cantidad de camiones (qty_trucks), un ejemplo con 10 clientes y tres camiones: [0,1,2,0,0,1,1,2,2,0]
+2. cada solucion se le calcula su fitness y se toma las n_elite cantidad de soluciones que tenga el fitness mas bajo.por ejemplo n_elite = 5, se toman las 5 soluciones con el fitness mas bajo,
+    si todas las soluciones tienen el fitness == inf, entonces el algoritmo devuelve False.
+3. a partir de las soluciones escogidas, entonces se crean nuevas soluciones, donde las soluciones escogidas sobreviven a las siguiente generacion y se crean las que falten para completar qty_poblacion,
+    la creacion se hace por medio de crossover y mutacion (la mutacion debe pasar por medio de la probabilidad dada por el hiperparametro: prob_de_mut)
+4. luego de crear la generacion, se repite el proceso desde el punto 2 hasta que se cumplan las n_generaciones
+5. Entonces se devuelve True y la solucion con menor fitness de la ultima generacion.
+
+3ra fase, crear grafo de la ruta para cada camion
+
+Al algoritmos se le pasa:
+    Una lista con la clasificacion en ruta de cada cliente, esta es la solucion del algoritmo genetico anterior (truck_clusters)
+    Un hiperparametro que es el radio de conexion de cada cliente en la ruta (conn_radius)
+
+1. Se dividen los clientes en base a como los clusterizo la solucion (truck_clusters)
+2. Entonces por cada division (truck_cluster) cada cliente se conecta con aquellos clientes que esten dentro de un radio de distancia euclidiano (conn_radius),
+    entonces se utiliza el algotimo de A* search para calcular la ruta entre estos, se guarda la ruta solucion y se crea un grafo con ambos nodos, donde el peso entre ellos es la distancia por via total.
+
+Ejemplo:
+truck_clusters = [0,1,2,0,0,1,1,2,2,0]
+
+truck_cluster0 = [0,3,4,9] #0
+truck_cluster1 = [1,5,6] #1
+truck_cluster2 = [2,7,8] #2
+
+3. Esto se hace por cada cliente hasta tener los grafos de cada cluster (que es por la cantidad de camiones)
+
+4ta fase, resolver camino mas optimo para cada camion en cada ruta
+
+En esta parte principalmente se resolvera un problema de TSP, donde el camion tiene que recorrer cada cliente y volver al depot de la manera 
+mas rapida posible, pero debe llegar a cada cliente dentro del time window establecido por este.
+
+Para hacer esto, se utilizara un algoritmo genetico.
+
+5ta fase, visualizar
