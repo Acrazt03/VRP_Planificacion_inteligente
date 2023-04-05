@@ -160,7 +160,7 @@ class GeoGraph(Graph):
                     return geoNode
     
     def get_random_node(self):
-       return random.sample(self.get_nodes(), 1)
+       return random.sample(self.get_nodes(), 1)[0]
 
 import heapq
 

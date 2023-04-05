@@ -1,5 +1,6 @@
 import geographs
 import random
+import math
 
 geoGraph = geographs.GeoGraph()
 
@@ -17,9 +18,12 @@ class Client():
 
         self.product = product
 
+    def __str__(self) -> str:
+        return f"Client {self.node.id} with time window: {self.time_window}, product: {self.product}, coords: {self.coords}"
+
 def create_nodes(Depot_coord: tuple, qty_clients: int, cap_trucks: int):
     
-    Depot_node = geoGraph.get_nearest_geoNode(Depot_coord)
+    Depot_node = geoGraph.get_nearest_geoNode(*Depot_coord)
 
     clients = []
 
@@ -32,6 +36,6 @@ def create_nodes(Depot_coord: tuple, qty_clients: int, cap_trucks: int):
     for client in clients:
         max_product_qty += client.product
 
-    qty_trucks = max_product_qty/cap_trucks
+    qty_trucks = math.ceil(max_product_qty/cap_trucks)
 
     return Depot_node, clients, qty_trucks
