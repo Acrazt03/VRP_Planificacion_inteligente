@@ -3,7 +3,7 @@ import vrp
 import geographs
 
 Depot_coord = (18.497205, -69.895533)
-qty_clients = 40
+qty_clients = 300
 cap_trucks = 100
 
 print("Loading data... ")
@@ -38,13 +38,19 @@ print("routes: ", routes)
 for graph in routes:
     print(graph.get_nodes())
 
-exit()
-
 import random
 
 random_graph = routes[0]
 
-nodes = random.sample(random_graph.get_nodes(), k=2)
+for route in routes:
+    
+    nodes = random_graph.get_nodes()
+
+    if len(nodes)==0:
+        continue
+    else:
+        nodes = random.sample(random_graph.get_nodes(), k=2)
+        break
 
 print(nodes)
 

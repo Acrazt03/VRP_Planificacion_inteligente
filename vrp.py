@@ -104,15 +104,17 @@ def create_routes(geoGraph,depot_node: geographs.GeoNode, clients: list, qty_tru
         
         truck_clusters.append(truck_cluster)
 
-    print("Truck Clusters: ", truck_clusters)
+    #print("Truck Clusters: ", truck_clusters)
 
     graphs = []
 
     i = 1
+    print(f"Truck {i}/{qty_trucks}")
 
     for truck_cluster in truck_clusters:
         graph = Graph()
-        print(f"Truck {i}/{qty_trucks}")
+        j = 1
+        print(f"    Client: {j}/{len(truck_cluster)}")
 
         for client in truck_cluster:
             for other_client in truck_cluster:
@@ -122,13 +124,15 @@ def create_routes(geoGraph,depot_node: geographs.GeoNode, clients: list, qty_tru
             
                 if geoGraph.calculate_euclidian_distance(client.node.name, other_client.node.name) <= conn_radius:
                     
+                    print('     A Star')
                     SUCCESS, visited, parent_node, _ = a_star_solver(geoGraph, client.node, other_client.node)
                     #print('Success: ', SUCCESS)
                     #print('Visited: ', [node.name for node in visited])
 
-                    #if not SUCCESS:
-                    #    continue
+                    if not SUCCESS:
+                        continue
 
+                    print('     Path reconstruct')
                     route, distance = reconstruct_path(geoGraph,client.node, other_client.node, parent_node)
                     #print(f'Distance: {distance:.2f} km')
 
@@ -141,6 +145,11 @@ def create_routes(geoGraph,depot_node: geographs.GeoNode, clients: list, qty_tru
                     graph.adj_list[client.node.name] = {}
                     
                     graph.add_vertex(client.node.name, other_client.node.name, w=distance, directed=True)
+                
+            print(f"    Client: {j}/{len(truck_cluster)}")
+            j += 1
+
+        print(f"Truck {i}/{qty_trucks}")
 
         i += 1
         graphs.append(graph)
