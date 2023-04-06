@@ -13,7 +13,7 @@ Depot_node, clients, qty_trucks = vrp.create_nodes(Depot_coord, qty_clients, cap
 
 #print(qty_trucks)
 
-qty_poblacion = 8
+qty_poblacion = 10
 n_elite = 6
 n_generations = 3
 prob_de_mut = 0.1
