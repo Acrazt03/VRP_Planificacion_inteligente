@@ -1,6 +1,6 @@
 class Node:
 
-  def __init__(self, name, value=None):
+  def __init__(self, name, value={}):
     self.name = name
     self.value = value
     self.domain = set()
@@ -28,7 +28,7 @@ class Graph:
     self.adj_list = {}
     self.nodes = {}
 
-  def add_node(self, name, value=None):
+  def add_node(self, name, value={}):
     self.nodes[name] = Node(name, value)
     self.adj_list[name] = {}
 

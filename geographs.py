@@ -148,6 +148,7 @@ class GeoGraph(Graph):
             except KeyError:
                 print('node not found')
     
+    
     def get_nearest_geoNode(self, lat, lon):
         
         min_distance = 0.05
@@ -166,6 +167,7 @@ class GeoGraph(Graph):
         return random_node
       else:
         return self.get_random_node()
+
 import heapq
 
 class PriorityQueue():
