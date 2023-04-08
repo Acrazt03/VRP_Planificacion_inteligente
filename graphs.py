@@ -1,3 +1,5 @@
+import numpy as np
+
 class Node:
 
   def __init__(self, name, value={}):
@@ -27,6 +29,9 @@ class Graph:
   def __init__(self):
     self.adj_list = {}
     self.nodes = {}
+        
+    self.node_to_index = {}
+    self.index_to_node = {}
 
   def add_node(self, name, value={}):
     self.nodes[name] = Node(name, value)
@@ -49,3 +54,43 @@ class Graph:
   
   def get_cost(self, node_a, node_b):
     return self.adj_list[node_a.name][node_b.name]
+
+  def get_adj_matrix(self, depot_node):
+
+    self.node_to_index = {}
+    self.index_to_node = {}
+
+    depot_index = 0
+    i = depot_index + 1
+
+    for node in self.get_nodes():
+      if node.name == depot_node.name:
+        self.node_to_index[depot_node.name] = depot_index
+        self.index_to_node[depot_index] = depot_node.name
+      else:
+        self.node_to_index[node.name] = i
+        self.index_to_node[i] = node.name
+        i += 1
+    
+    qty_nodes = len(self.get_nodes())
+    adj_matrix = np.matrix(np.ones((qty_nodes,qty_nodes)) * np.inf)
+
+    for node in self.get_nodes():
+      node_idx = self.node_to_index[node.name]
+
+      for neigh in self.get_neighbors_of(node.name):
+        neigh_idx = self.node_to_index[neigh.name]
+
+        adj_matrix[node_idx,neigh_idx] = self.get_cost(node, neigh)
+      
+    return adj_matrix.tolist()
+
+  def add_node_and_connect(self, node_a, node_b, distance):
+    
+    if node_a.name not in self.nodes:
+      self.nodes[node_a.name] = node_a
+
+    if node_a.name not in self.adj_list:
+      self.adj_list[node_a.name] = {}
+    
+    self.adj_list[node_a.name][node_b.name] = distance

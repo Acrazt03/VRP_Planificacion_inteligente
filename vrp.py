@@ -15,6 +15,7 @@ class Client():
             #Random
             self.node = geoGraph.get_random_node()
             self.coords = (self.node.lat, self.node.lon)
+            self.name = self.node.name
         
         if not time_window:
             start = random.randint(0, 24)
@@ -233,34 +234,43 @@ def create_routes(geoGraph,depot_node: geographs.GeoNode, clients: list, qty_tru
 
         for client in truck_cluster:
             path = {}
+
             other_nodes = [other_truck_client.node for other_truck_client in truck_cluster]
             nearest_nodes = get_n_nearest_nodes(client.node, other_nodes, n_nearest_nodes)
+
+            nearest_nodes.append(depot_node)
 
             print(f"Nearest nodes for client {client.node.name}: {[near_node.name for near_node in nearest_nodes]}")
 
             for other_client in nearest_nodes:
-
-                SUCCESS, visited, parent_node, _ = a_star_solver(geoGraph, client.node, other_client)
-
-                if not SUCCESS:
-                    raise Exception(f"Sorry, A Star Didn't work \n{visited}\n{parent_node}\n{_}")
-
-                route, distance = reconstruct_path(geoGraph,client.node, other_client, parent_node)
-
+                route = connect_nodes(geoGraph, graph, client.node, other_client)
                 path[other_client.name] = route
 
-                #client.node.value[other_client.name] = route 
-
-                graph.nodes[client.node.name] = client.node
-                graph.adj_list[client.node.name] = {}
-                
-                graph.add_vertex(client.node.name, other_client.name, w=distance, directed=True)
-            
             route_paths[client.node.name] = path
         
-        i += 1
-        paths.append(route_paths)
+        other_nodes = [other_truck_client.node for other_truck_client in truck_cluster]
 
+        for other_client in other_nodes:
+            route = connect_nodes(geoGraph, graph, depot_node, other_client)
+            path[other_client.name] = route
+
+        route_paths[depot_node.name] = path
+
+        i += 1        
+        paths.append(route_paths)
         graphs.append(graph)
     
     return graphs, paths
+
+def connect_nodes( geoGraph, graph, initial_node, goal_node):
+
+    print(f"Connecting {initial_node.name} and {goal_node.name}")
+    SUCCESS, visited, parent_node, _ = a_star_solver(geoGraph, initial_node, goal_node)
+
+    if not SUCCESS:
+        raise Exception(f"Sorry, A Star Didn't work \n{visited}\n{parent_node}\n{_}")
+
+    route, distance = reconstruct_path(geoGraph,initial_node, goal_node, parent_node)
+
+    graph.add_node_and_connect(initial_node, goal_node, distance)
+    return route
