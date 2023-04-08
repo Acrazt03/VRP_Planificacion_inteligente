@@ -88,7 +88,7 @@ def calculate_distance_coords(lat1, lon1, lat2, lon2):
 
 class GeoGraph(Graph):
 
-    def __init__(self, osm_file_path='santo_domingo.osm'):
+    def __init__(self, osm_file_path='santo_domingo.osm', limit_coords=None):
         
         super().__init__()
 
@@ -113,7 +113,19 @@ class GeoGraph(Graph):
         for node in self.get_nodes():
             if len(self.get_neighbors_of(node.name)) == 0:
                 self.nodes[node.name].available = False
+        
+        available_nodes = [node for node in self.get_nodes() if node.available]
+        print(f'Available nodes before condition: {len(available_nodes)}')
 
+        if limit_coords:
+          centroid_node = self.get_nearest_geoNode(*limit_coords)
+          for node in self.get_nodes():
+            if self.calculate_euclidian_distance(centroid_node.name, node.name) >= 5:
+               self.nodes[node.name].available = False
+
+        available_nodes = [node for node in self.get_nodes() if node.available]
+        print(f'Available nodes after condition: {len(available_nodes)}')
+        
     def add_geo_node(self, id, x, y, lat, lon):
         self.nodes[id] = GeoNode(id, x, y, lat, lon)
         self.adj_list[id] = {}
@@ -161,12 +173,16 @@ class GeoGraph(Graph):
                     return geoNode
     
     def get_random_node(self):
-      random_node = random.sample(self.get_nodes(), 1)[0]
+      available_nodes = [node for node in self.get_nodes() if node.available]
+      return self.select_random_node(available_nodes)
+    
+    def select_random_node(self, nodes):
+      random_node = random.sample(nodes, 1)[0]
       
       if random_node.available:
         return random_node
       else:
-        return self.get_random_node()
+        return self.select_random_node()
 
 import heapq
 

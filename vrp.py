@@ -221,16 +221,18 @@ def create_routes(geoGraph,depot_node: geographs.GeoNode, clients: list, qty_tru
     #print("Truck Clusters: ", truck_clusters)
 
     graphs = []
+    paths = []
 
     i = 1
 
     for truck_cluster in truck_clusters:
         graph = Graph()
+        route_paths = {}
         print(f"Truck {i}/{qty_trucks}")
         print(f"Len del client cluster: {len(truck_cluster)}")
 
         for client in truck_cluster:
-
+            path = {}
             other_nodes = [other_truck_client.node for other_truck_client in truck_cluster]
             nearest_nodes = get_n_nearest_nodes(client.node, other_nodes, n_nearest_nodes)
 
@@ -245,14 +247,20 @@ def create_routes(geoGraph,depot_node: geographs.GeoNode, clients: list, qty_tru
 
                 route, distance = reconstruct_path(geoGraph,client.node, other_client, parent_node)
 
-                client.node.value[other_client.name] = route 
+                path[other_client.name] = route
+
+                #client.node.value[other_client.name] = route 
 
                 graph.nodes[client.node.name] = client.node
                 graph.adj_list[client.node.name] = {}
                 
                 graph.add_vertex(client.node.name, other_client.name, w=distance, directed=True)
-
+            
+            route_paths[client.node.name] = path
+        
         i += 1
+        paths.append(route_paths)
+
         graphs.append(graph)
     
-    return graphs
+    return graphs, paths
