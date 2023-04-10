@@ -1,17 +1,13 @@
+import numpy as np
 import random
 import copy
-import numpy as np
 
 inf = float('inf')
-
 def create_population(population_num, cities_list, initial_city):
-  
   cities = copy.copy(cities_list)
-
   cities.remove(initial_city)
   
   solutions = []
-  
   for new_solution in range(population_num):
     solution = copy.copy(cities)
         
@@ -22,12 +18,11 @@ def create_population(population_num, cities_list, initial_city):
 
   return solutions
 
-def calc_distances_paths(graph, initial_city, solutions):
-  
+
+def calc_distances_paths(graph, initial_city, solutions):  
   distances = []
 
   for solution in solutions:
-
     distance = 0
 
     if len(solution) != len(set(solution)):
@@ -44,13 +39,14 @@ def calc_distances_paths(graph, initial_city, solutions):
 
   return distances
 
+
 def calc_fitness(distances):
   fitnesess = np.exp2(-np.array(distances))*100
   
   return fitnesess
 
-def crossover_solutions(solutions, population_num):
 
+def crossover_solutions(solutions, population_num):
   crossovered_solutions = []
 
   #Keep the best alive for the next gen
@@ -58,7 +54,6 @@ def crossover_solutions(solutions, population_num):
     crossovered_solutions.append(solution)
 
   for new_solution in range(population_num-len(solutions)):
-
     crossover_point = random.randint(0, len(solutions[0]))
     
     parents = copy.deepcopy(random.sample(solutions, 2))
@@ -72,11 +67,12 @@ def crossover_solutions(solutions, population_num):
 
   return crossovered_solutions
 
+
 def should_mutate(mutation_prob):
     return random.random() < mutation_prob
 
-def mutate_solutions(solutions, mutation_prob):
 
+def mutate_solutions(solutions, mutation_prob):
   mutated_solutions = copy.deepcopy(solutions)
 
   for solution in mutated_solutions:
@@ -90,6 +86,7 @@ def mutate_solutions(solutions, mutation_prob):
       solution[mutation_pointB] = temp
   
   return mutated_solutions
+
 
 def sort_solutions_by_distance(gen_solutions, distances):
   sorted_lists = sorted(zip(gen_solutions, distances))

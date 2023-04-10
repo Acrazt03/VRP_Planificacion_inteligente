@@ -1,7 +1,6 @@
 import numpy as np
 
 class Node:
-
   def __init__(self, name, value={}):
     self.name = name
     self.value = value
@@ -25,6 +24,7 @@ class Node:
   def __lt__(self, other):
     return True
   
+
 class Graph:
   def __init__(self):
     self.adj_list = {}
@@ -33,15 +33,18 @@ class Graph:
     self.node_to_index = {}
     self.index_to_node = {}
 
+
   def add_node(self, name, value={}):
     self.nodes[name] = Node(name, value)
     self.adj_list[name] = {}
+
 
   def add_vertex(self, name_a, name_b, w=1, directed=False):
     if name_a not in self.adj_list.keys(): self.add_node(name_a)
     if name_b not in self.adj_list.keys(): self.add_node(name_b)
     self.adj_list[name_a][name_b] = w
     if not directed: self.adj_list[name_b][name_a] = w
+
 
   def get_nodes(self):
     return set(self.nodes.values())
@@ -56,7 +59,6 @@ class Graph:
     return self.adj_list[node_a.name][node_b.name]
 
   def get_adj_matrix(self, depot_node):
-
     self.node_to_index = {}
     self.index_to_node = {}
 
@@ -85,8 +87,8 @@ class Graph:
       
     return adj_matrix.tolist()
 
+
   def add_node_and_connect(self, node_a, node_b, distance):
-    
     if node_a.name not in self.nodes:
       self.nodes[node_a.name] = node_a
 

@@ -1,6 +1,4 @@
-
 from geographs import Graph, GeoNode, calculate_distance_coords
-
 import heapq
 
 class PriorityQueue():
@@ -35,7 +33,6 @@ def heuristic_func(current_node: GeoNode, goal_node: GeoNode):
     return distance*5 - is_primary*0.5 - n_lanes*0.5
 
 def a_star_solver(graph: Graph, initial_node: GeoNode, goal_node: GeoNode):
-
     frontier = PriorityQueue()
     frontier.put((0, initial_node))
 
@@ -48,17 +45,14 @@ def a_star_solver(graph: Graph, initial_node: GeoNode, goal_node: GeoNode):
 
     parents = {}
     parents[initial_node] = None
-
     while not frontier.isEmpty():
         value, current_node = frontier.get()
 
         visited.append(current_node)
-
         if current_node == goal_node:
             return True, visited, parents,cost_of_path#[goal_node]
 
         for neighbor in graph.get_neighbors_of(current_node.name):
-            
             nodes_in_frontier = [node[1] for node in frontier.data]
             
             #print('Current Node: ', current_node)
@@ -67,7 +61,6 @@ def a_star_solver(graph: Graph, initial_node: GeoNode, goal_node: GeoNode):
             #print('Condition 2: ', neighbor in nodes_in_frontier)
 
             neighbor_cost = cost_of_path[current_node] + graph.get_cost(current_node, neighbor)
-
             #if it is not in the frontier and has not been visited add it to the frontier with its value
             if(neighbor not in nodes_in_frontier and neighbor not in visited):
                 #Calculate the heuristic cost for this node and add it to the PriorityQueue
@@ -83,5 +76,3 @@ def a_star_solver(graph: Graph, initial_node: GeoNode, goal_node: GeoNode):
             #        cost_of_path[neighbor] = neighbor_cost
 
     return False, visited, parents, cost_of_path#[goal_node]
-
-

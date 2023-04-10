@@ -1,13 +1,11 @@
-import copy
 import random
 import numpy
+import copy
 
 inf = float('inf')
 
 class Ant:
-  
   def __init__(self, Original_graph, initial_city, params):
-
     self.inf = float('inf')
     #Variable that saves the distance the ant has walked
     self.path_distance = 0
@@ -28,16 +26,18 @@ class Ant:
     self.pheromone_exp = params[3]
     self.pheromone_evaporation_rate = params[4]
   
+
   def check_visited(self):
     #Set the distance to already visited cities to inf(so the ant doesn't move to those)
     for visited_city_index in range(len(self.visited_cities)):
       self.current_city[self.visited_cities[visited_city_index]] = self.inf
   
+
   def pow_list(self, list, power=1): 
     return [number**power for number in list]
 
-  def calc_desirabilities(self,pheromones_traces):
 
+  def calc_desirabilities(self,pheromones_traces):
     canMove = False
 
     for candidate_city in self.current_city:
@@ -51,6 +51,7 @@ class Ant:
     #print("Desirabilities: ", self.desirabilities)
     else:
       self.desirabilities = []
+
 
   def move(self):
     #Get a list (a range) with the indexes for all the child cities of the current cities
@@ -78,12 +79,13 @@ class Ant:
     #Add the next city to the visited cities list
     self.visited_cities.append(self.next_city)
   
+
   def come_back(self, Original_graph):
     #Move the ant to the initial city and add the distance to the total path distance
     self.path_distance += Original_graph[self.current_city_index][self.initial_city]
 
-  def leave_pheromones(self, pht):
 
+  def leave_pheromones(self, pht):
     #Loop to go truh each visited city (-1 the last one, maybe should cahnge it later)
     for visited_city_index in range(len(self.visited_cities)-1):
       #Update the pheromones trace strenght of the path's vertex, proportionally to the total distance of the answered path by the ant
@@ -93,10 +95,9 @@ class Ant:
     
     return pht
 
-class Colony:
-  
-  def __init__(self, Graph, ants_num, pheromones_traces, params):
 
+class Colony:
+  def __init__(self, Graph, ants_num, pheromones_traces, params):
     self.inf = 999999
     self.Ants = []
 
@@ -118,10 +119,8 @@ class Colony:
     self.params = params
 
   def solve(self, Original_graph, initial_city, iterations=1):
-    
     #Loop for each iteration
     for iteration in range(iterations):
-
       #Kill the remaining ants and create new one
       self.Ants.clear()
       for ant in range(self.ants_number):
