@@ -1,4 +1,3 @@
-from memory_profiler import profile
 import numpy as np
 import random
 

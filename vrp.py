@@ -4,9 +4,10 @@ from graphs import Graph, Node
 import geographs
 import random
 import math
+import numpy as np
 
 class Client():
-    def __init__(self, geoGraph, coords: tuple=None, time_window: tuple=None, product: int=10):
+    def __init__(self, geoGraph, coords: tuple=None, time_window: tuple=None, product: int=10):#random.randint(0, 10)):
 
         if not coords:
             #Random
@@ -133,7 +134,7 @@ class create_clusters:
 
                     distances += self.geoGraph.calculate_euclidian_distance(client.node.name, other_client.node.name)
 
-            distances /= len(truck_cluster)*2
+            #distances /= len(truck_cluster)
 
         return distances
 
@@ -155,132 +156,6 @@ def create_nodes(geoGraph, Depot_coord: tuple, qty_clients: int, cap_trucks: int
 
     return Depot_node, clients, qty_trucks
 
-"""
-def create_clusters(qty_clients: int , qty_trucks: int, qty_poblacion: int, n_elite: int, n_generations: int, prob_de_mut: float = 0.1):
-    
-    best_solution = []
-
-    for i in range(qty_clients):
-        best_solution.append(random.randint(0, qty_trucks-1))
-    
-    return best_solution
-"""
-"""
-def create_clusters(geoGraph, qty_clients: int , qty_trucks: int, cap_trucks: int, qty_poblacion: int, n_elite: int, n_generations: int, clients, prob_de_mut: float = 0.1):
-    population = []
-
-    for i in range(qty_poblacion):
-        inv = []
-
-        for j in range(qty_clients):
-            inv.append(random.randint(0, qty_trucks-1))
-            
-        population.append(inv)
-
-    #print(population)
-    for generation in range(n_generations):
-        population_fitness = [fitness(geoGraph, solution, qty_trucks, clients, cap_trucks) for solution in population]
-        #print(population_fitness)
-
-        #Selection
-        population_fitness_pair = list(zip(population, population_fitness))
-        n_elite_pairs = sorted(population_fitness_pair, key = lambda x: x[1])[:n_elite]
-        n_elite_individuals = [x[0] for x in n_elite_pairs]
-
-        #population_fitness = [fitness(geoGraph, solution, qty_trucks, clients, cap_trucks) for solution in population]
-
-        qty_individuals_to_create = qty_poblacion - n_elite
-
-        #Creation
-        population = []
-        for i in range(qty_individuals_to_create):
-            parent_1, parent_2 = random.sample(n_elite_individuals, 2)
-
-            child = crossover(parent_1, parent_2)
-            population.append(child)
-
-        #Mutation
-        for individual in population:
-            if random.random() < prob_de_mut:
-                i, j = random.sample(range(len(individual)), 2)
-                individual[i], individual[j] = individual[j], individual[i]
-
-        population = n_elite_individuals + population
-
-    population_fitness = [fitness(geoGraph, solution, qty_trucks, clients, cap_trucks) for solution in population]
-
-    #Selection
-    population_fitness_pair = list(zip(population, population_fitness))
-    sorted_population = sorted(population_fitness_pair, key = lambda x: x[1])
-    solutions = [x[0] for x in sorted_population]
-    best_solution = solutions[0]
-
-    return best_solution
-
-
-def crossover(parent1, parent2):
-    op = random.randint(1, len(parent1) - 1)
-
-    child = parent1[:op] + parent2[op:]
-    #child2 = parent2[:op] + parent1[op:]
-
-    return child#1, child2
-
-
-def fitness(geoGraph, solution, qty_trucks, clients, cap_trucks):
-    #print(solution)
-    truck_clusters = []
-    fitness = 0
-
-    for cluster_id in range(qty_trucks):
-        client_ids = find_indices(solution, cluster_id)
-
-        truck_cluster = []
-
-        for client_id in client_ids:
-            truck_cluster.append(clients[client_id])
-        
-        truck_clusters.append(truck_cluster)
-
-    for cluster in truck_clusters:
-        total_cap = 0
-
-        for client in cluster:
-            total_cap += client.product
-
-        if total_cap > cap_trucks:
-            return float('inf')
-        
-    fitness = distance(geoGraph, truck_clusters)
-
-    return fitness
-
-
-def distance(geoGraph, truck_clusters):
-    distances = 0
-
-    #print(truck_clusters)
-    for truck_cluster in truck_clusters:
-        for client in truck_cluster:
-            for other_client in truck_cluster:
-                
-                if client == other_client:
-                    continue
-
-                distances += geoGraph.calculate_euclidian_distance(client.node.name, other_client.node.name)
-
-        #print(len(truck_cluster))
-        distances /= len(truck_cluster)*2
-
-    return distances
-
-def find_indices(list_to_check, item_to_find):
-    indices = []
-    for idx, value in enumerate(list_to_check):
-        if value == item_to_find:
-            indices.append(idx)
-    return indices
-"""
 def reconstruct_path(geoGraph,start_node, goal_node, parent_node):
   path = [goal_node]
 
@@ -303,8 +178,10 @@ def reconstruct_path(geoGraph,start_node, goal_node, parent_node):
 
   for i in range(len(path)-1):
     if not path[i]:
+        continue
         raise Exception('El primer path dio problemas')
     elif not path[i+1]:
+        continue
         raise Exception('El segundo path dio problemas')
     
     cost += geoGraph.get_cost(path[i], path[i+1])
@@ -380,7 +257,7 @@ def create_routes(geoGraph,depot_node: geographs.GeoNode, clients: list, qty_tru
 
 def connect_nodes( geoGraph, graph, initial_node, goal_node):
 
-    print(f"Connecting {initial_node.name} and {goal_node.name}")
+    #print(f"Connecting {initial_node.name} and {goal_node.name}")
     SUCCESS, visited, parent_node, _ = a_star_solver(geoGraph, initial_node, goal_node)
 
     if not SUCCESS:
