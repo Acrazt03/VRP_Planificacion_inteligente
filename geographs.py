@@ -112,8 +112,8 @@ class GeoGraph(Graph):
             if len(self.get_neighbors_of(node.name)) == 0:
                 self.nodes[node.name].available = False
         
-        available_nodes = [node for node in self.get_nodes() if node.available]
-        print(f'Available nodes before condition: {len(available_nodes)}')
+        #available_nodes = [node for node in self.get_nodes() if node.available]
+        #print(f'Available nodes before condition: {len(available_nodes)}')
 
         if limit_coords:
           centroid_node = self.get_nearest_geoNode(*limit_coords)
@@ -121,8 +121,8 @@ class GeoGraph(Graph):
             if self.calculate_euclidian_distance(centroid_node.name, node.name) >= 4:
                self.nodes[node.name].available = False
 
-        available_nodes = [node for node in self.get_nodes() if node.available]
-        print(f'Available nodes after condition: {len(available_nodes)}')
+        #available_nodes = [node for node in self.get_nodes() if node.available]
+        #print(f'Available nodes after condition: {len(available_nodes)}')
         
 
     def add_geo_node(self, id, x, y, lat, lon):

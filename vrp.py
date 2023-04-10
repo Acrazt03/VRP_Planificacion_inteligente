@@ -1,22 +1,28 @@
-from routegraphs import RouteNode
 from AStar import a_star_solver
-from graphs import Graph, Node
+from graphs import Graph
 import geographs
 import random
 import math
 import numpy as np
 
 class Client():
-    def __init__(self, geoGraph, coords: tuple=None, time_window: tuple=None, product: int=10):
+    def __init__(self, geoGraph, coords: tuple=None, time_window: tuple=None, product: int=10, start_time=0):
         if not coords:
             #Random
             self.node = geoGraph.get_random_node()
             self.coords = (self.node.lat, self.node.lon)
             self.name = self.node.name
-        
+        else:
+            self.node = geoGraph.get_nearest_node(coords[0], coords[1])
+            self.coords = (self.node.lat, self.node.lon)
+            self.name = self.node.name
+
         if not time_window:
-            start = random.randint(0, 24)
+            start = random.randint(start_time+1, 24)
             self.time_window = (start, start+1)
+        if time_window:
+            start = time_window[0]
+            self.time_window = (start, start+time_window[1])
 
         self.product = product
 
@@ -44,7 +50,6 @@ class create_clusters:
         self.geoGraph = geoGraph
         self.n_elite = n_elite
         self.clients = clients 
-
 
     def create_clusters(self):
         population = []
@@ -145,12 +150,16 @@ class create_clusters:
         return distances
 
 
-def create_nodes(geoGraph, Depot_coord: tuple, qty_clients: int, cap_trucks: int):
+def create_nodes(geoGraph, Depot_coord: tuple, qty_clients: int, cap_trucks: int, clients=None):
     Depot_node = geoGraph.get_nearest_geoNode(*Depot_coord)
-    clients = []
+    
+    if not clients:
+        clients = []
 
-    for i in range(qty_clients):
-        clients.append(Client(geoGraph))
+        for i in range(qty_clients):
+            clients.append(Client(geoGraph))
+    else:
+        qty_clients = len(clients)
     
     max_product_qty = 0
 
