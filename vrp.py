@@ -1,9 +1,9 @@
 from AStar import a_star_solver
 from graphs import Graph
+import numpy as np
 import geographs
 import random
 import math
-import numpy as np
 
 class Client():
     def __init__(self, geoGraph, coords: tuple=None, time_window: tuple=None, product: int=10, start_time=0):
