@@ -4,6 +4,7 @@ from graphs import Graph, Node
 import geographs
 import random
 import math
+import numpy as np
 
 class Client():
     def __init__(self, geoGraph, coords: tuple=None, time_window: tuple=None, product: int=10):
@@ -139,7 +140,8 @@ class create_clusters:
 
                     distances += self.geoGraph.calculate_euclidian_distance(client.node.name, other_client.node.name)
 
-            distances /= len(truck_cluster)*2
+            #distances /= len(truck_cluster)
+
         return distances
 
 
@@ -179,8 +181,10 @@ def reconstruct_path(geoGraph,start_node, goal_node, parent_node):
 
   for i in range(len(path)-1):
     if not path[i]:
+        continue
         raise Exception('El primer path dio problemas')
     elif not path[i+1]:
+        continue
         raise Exception('El segundo path dio problemas')
     
     cost += geoGraph.get_cost(path[i], path[i+1])
@@ -254,6 +258,7 @@ def create_routes(geoGraph,depot_node: geographs.GeoNode, clients: list, qty_tru
 
 
 def connect_nodes( geoGraph, graph, initial_node, goal_node):
+
     print(f"Connecting {initial_node.name} and {goal_node.name}")
     SUCCESS, visited, parent_node, _ = a_star_solver(geoGraph, initial_node, goal_node)
 

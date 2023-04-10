@@ -120,7 +120,7 @@ class GeoGraph(Graph):
         if limit_coords:
           centroid_node = self.get_nearest_geoNode(*limit_coords)
           for node in self.get_nodes():
-            if self.calculate_euclidian_distance(centroid_node.name, node.name) >= 5:
+            if self.calculate_euclidian_distance(centroid_node.name, node.name) >= 4:
                self.nodes[node.name].available = False
 
         available_nodes = [node for node in self.get_nodes() if node.available]
