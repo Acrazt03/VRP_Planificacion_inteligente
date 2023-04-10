@@ -113,10 +113,13 @@ celerybeat.pid
 
 # Environments
 .env
+.vrp_env
 .venv
+vrp_env/
 env/
 venv/
 ENV/
+vrp_env/
 env.bak/
 venv.bak/
 
