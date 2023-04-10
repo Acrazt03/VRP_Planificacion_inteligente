@@ -154,3 +154,9 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 *.pyc
+__pycache__/ACO.cpython-39.pyc
+*.pyc
+*.pyc
+*.pyc
+*.pyc
+*.pyc
