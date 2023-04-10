@@ -9,7 +9,7 @@ from AStar import a_star_solver
 from routegraphs import RouteNode
 
 class Client():
-    def __init__(self, geoGraph, coords: tuple=None, time_window: tuple=None, product: float=10):
+    def __init__(self, geoGraph, coords: tuple=None, time_window: tuple=None, product: float=random.randint(1, 10)):
 
         if not coords:
             #Random
