@@ -7,8 +7,7 @@ import math
 import numpy as np
 
 class Client():
-    def __init__(self, geoGraph, coords: tuple=None, time_window: tuple=None, product: int=10):#random.randint(0, 10)):
-
+    def __init__(self, geoGraph, coords: tuple=None, time_window: tuple=None, product: int=10):
         if not coords:
             #Random
             self.node = geoGraph.get_random_node()
@@ -24,12 +23,15 @@ class Client():
     def __str__(self) -> str:
         return f"Client {self.node.id} with time window: {self.time_window}, product: {self.product}, coords: {self.coords}"
 
+
 def find_indices(list_to_check, item_to_find):
     indices = []
     for idx, value in enumerate(list_to_check):
         if value == item_to_find:
             indices.append(idx)
+
     return indices
+
 
 class create_clusters:
     def __init__(self, geoGraph, qty_clients: int , qty_trucks: int, cap_trucks: int, qty_poblacion: int, n_elite: int, n_generations: int, clients, prob_de_mut: float = 0.1):
@@ -42,6 +44,7 @@ class create_clusters:
         self.geoGraph = geoGraph
         self.n_elite = n_elite
         self.clients = clients 
+
 
     def create_clusters(self):
         population = []
@@ -89,6 +92,7 @@ class create_clusters:
 
         return best_solution
 
+
     def crossover(self, parent1, parent2):
         op = random.randint(1, len(parent1) - 1)
 
@@ -96,6 +100,7 @@ class create_clusters:
         child2 = parent2[:op] + parent1[op:]
 
         return child1, child2
+
 
     def fitness(self, solution):
         truck_clusters = []
@@ -122,6 +127,7 @@ class create_clusters:
         fitness = self.distance(truck_clusters)
         return fitness
 
+
     def distance(self, truck_clusters):
         distances = 0
 
@@ -138,10 +144,9 @@ class create_clusters:
 
         return distances
 
-def create_nodes(geoGraph, Depot_coord: tuple, qty_clients: int, cap_trucks: int):
-    
-    Depot_node = geoGraph.get_nearest_geoNode(*Depot_coord)
 
+def create_nodes(geoGraph, Depot_coord: tuple, qty_clients: int, cap_trucks: int):
+    Depot_node = geoGraph.get_nearest_geoNode(*Depot_coord)
     clients = []
 
     for i in range(qty_clients):
@@ -153,8 +158,8 @@ def create_nodes(geoGraph, Depot_coord: tuple, qty_clients: int, cap_trucks: int
         max_product_qty += client.product
 
     qty_trucks = math.ceil(max_product_qty/cap_trucks)
-
     return Depot_node, clients, qty_trucks
+
 
 def reconstruct_path(geoGraph,start_node, goal_node, parent_node):
   path = [goal_node]
@@ -163,7 +168,6 @@ def reconstruct_path(geoGraph,start_node, goal_node, parent_node):
   path.append(current_parent)
 
   while current_parent:
-
     next_parent = parent_node[current_parent]
     path.append(next_parent)
 
@@ -173,7 +177,6 @@ def reconstruct_path(geoGraph,start_node, goal_node, parent_node):
     current_parent = next_parent
   
   path.reverse()
-
   cost = 0
 
   for i in range(len(path)-1):
@@ -188,6 +191,7 @@ def reconstruct_path(geoGraph,start_node, goal_node, parent_node):
 
   return path, cost
 
+
 def get_n_nearest_nodes(node_a, other_nodes, n_nearest_nodes):
       nodes = list(other_nodes)
 
@@ -198,15 +202,14 @@ def get_n_nearest_nodes(node_a, other_nodes, n_nearest_nodes):
       else:
          return sorted_nodes
 
-def create_routes(geoGraph,depot_node: geographs.GeoNode, clients: list, qty_trucks: int, clusters: list, n_nearest_nodes: int):
 
+def create_routes(geoGraph,depot_node: geographs.GeoNode, clients: list, qty_trucks: int, clusters: list, n_nearest_nodes: int):
     truck_clusters = []
 
     for cluster_id in range(qty_trucks):
         client_ids = find_indices(clusters, cluster_id)
 
         truck_cluster = []
-
         for client_id in client_ids:
             truck_cluster.append(clients[client_id])
         
@@ -218,7 +221,6 @@ def create_routes(geoGraph,depot_node: geographs.GeoNode, clients: list, qty_tru
     paths = []
 
     i = 1
-
     for truck_cluster in truck_clusters:
         graph = Graph()
         route_paths = {}
@@ -230,7 +232,6 @@ def create_routes(geoGraph,depot_node: geographs.GeoNode, clients: list, qty_tru
 
             other_nodes = [other_truck_client.node for other_truck_client in truck_cluster]
             nearest_nodes = get_n_nearest_nodes(client.node, other_nodes, n_nearest_nodes)
-
             nearest_nodes.append(depot_node)
 
             #print(f"Nearest nodes for client {client.node.name}: {[near_node.name for near_node in nearest_nodes]}")
@@ -255,9 +256,10 @@ def create_routes(geoGraph,depot_node: geographs.GeoNode, clients: list, qty_tru
     
     return graphs, paths
 
+
 def connect_nodes( geoGraph, graph, initial_node, goal_node):
 
-    #print(f"Connecting {initial_node.name} and {goal_node.name}")
+    print(f"Connecting {initial_node.name} and {goal_node.name}")
     SUCCESS, visited, parent_node, _ = a_star_solver(geoGraph, initial_node, goal_node)
 
     if not SUCCESS:
